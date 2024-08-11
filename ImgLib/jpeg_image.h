@@ -4,7 +4,6 @@
 #include <filesystem>
 
 namespace img_lib {
-using Path = std::filesystem::path;
 
 Image LoadJPEG(const Path& file);
 

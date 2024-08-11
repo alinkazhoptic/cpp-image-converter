@@ -1,6 +1,7 @@
 #include "ppm_image.h"
 
 #include <array>
+#include <iostream>
 #include <fstream>
 #include <string_view>
 
@@ -15,6 +16,11 @@ static const int PPM_MAX = 255;
 bool SavePPM(const Path& file, const Image& image) {
     bool res = false;
     ofstream ofs(file, ios::binary);
+
+    if (!ofs.is_open()) {
+        std::cerr << "Error in input file opening"sv << std::endl;
+        return res;
+    }
     
     // Узнаем параметры изображения:
     int w, h, step;
@@ -26,7 +32,7 @@ bool SavePPM(const Path& file, const Image& image) {
         return res;
     }
     
-    // Записываем заголовок
+    // Записываем заголовок 
     ofs << PPM_SIG << "\n" << w << " " << h << "\n"  << PPM_MAX << "\n";
     
     std::vector<char> buff(w * 3);

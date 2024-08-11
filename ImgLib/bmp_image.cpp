@@ -52,6 +52,12 @@ static int GetBMPStride(int w) {
 bool SaveBMP(const Path& file, const Image& image){
     bool res = false;
     ofstream ofs(file, ios::binary);
+
+    if (!ofs.is_open()) {
+        std::cerr << "Error in input file opening"sv << std::endl;
+        return res;
+    }
+
     
     // Инициируем структуры header-ов BMP
     BitmapFileHeader file_header;
@@ -70,6 +76,11 @@ bool SaveBMP(const Path& file, const Image& image){
     // Записываем заголовки
     ofs.write(reinterpret_cast<char*>(&file_header), sizeof(file_header));
     ofs.write(reinterpret_cast<char*>(&info_header), sizeof(info_header));
+
+    if (!ofs.good()) {
+        std::cerr << "Error in writing the headers"sv << std::endl;
+        return res;
+    }
     
     // В буфер будем записывать строку изображения с учетом padding
     std::vector<char> buff(stride);
@@ -105,6 +116,12 @@ Image LoadBMP(const Path& file) {
     // открываем поток с флагом ios::binary
     // поскольку будем читать даные в двоичном формате
     ifstream ifs(file, ios::binary);
+
+    if (!ifs.is_open()) {
+        std::cerr << "Error in output file opening"sv << std::endl;
+        return {};
+    }
+
     std::string sign;
     BitmapFileHeader file_header;
     BitmapInfoHeader info_header;
@@ -112,6 +129,11 @@ Image LoadBMP(const Path& file) {
     // читаем заголовки
     ifs.read(reinterpret_cast<char*>(&file_header), sizeof(file_header));
     ifs.read(reinterpret_cast<char*>(&info_header), sizeof(info_header));
+
+    if (!ifs.good()) {
+        std::cerr << "Error in reading the headers"sv << std::endl;
+        return {};
+    }
 
 
     // мы поддерживаем изображения только формата P6
@@ -126,7 +148,7 @@ Image LoadBMP(const Path& file) {
     int stride = GetBMPStride(info_header.img_width);
 
     if (stride * info_header.img_height != info_header.data_size) {
-        std::cerr << "Incorrect stride or data size in BMP info header"sv;
+        std::cerr << "Incorrect stride or data size in BMP info header"sv << std::endl;
         return {};
     }
 
@@ -146,6 +168,11 @@ Image LoadBMP(const Path& file) {
             line[x].g = static_cast<byte>(buff[x * 3 + 1]);
             line[x].r = static_cast<byte>(buff[x * 3 + 2]);
         }    
+    }
+
+    if (!ifs.good()) {
+        std::cerr << "Error in image writing"sv << std::endl;
+        return{};
     }
 
     return result_img;

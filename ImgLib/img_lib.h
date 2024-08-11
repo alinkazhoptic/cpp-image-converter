@@ -3,9 +3,13 @@
 #include <array>
 #include <cassert>
 #include <cstddef>
+#include <filesystem>
 #include <vector>
 
+
 namespace img_lib {
+    
+using Path = std::filesystem::path;
 
 struct Size {
     int width;
